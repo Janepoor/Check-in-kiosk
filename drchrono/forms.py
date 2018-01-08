@@ -127,7 +127,7 @@ HOUR_OPTIONS = (
     (12,'12 hours'),
 )
 
-# forms go here
+
 class AppointmentSelectionForm(forms.Form):
     appt_id = forms.CharField(max_length=1024) # described in API as either a number or 'Unique identifier. Usually numeric, but not always.'
 
@@ -171,3 +171,4 @@ class SettingsUpdateForm(forms.Form):
 
 class TerminateKioskInstanceForm(forms.Form):
     action = forms.CharField(max_length=1024, required=False, label='Enter terminate below to sign out of your kiosks')
+

@@ -5,12 +5,15 @@ import views
 
 
 urlpatterns = [
-    url(r'^$', TemplateView.as_view(template_name='index.html'), name='home'),
+    url(r'^$', views.home, name='home'),
 
     # add basic url
-    url(r'^admin$',views.admin,name = 'admin'),
-    url(r'^doctor',views.doctor, name = 'doctor'),
-# timezone helper
+    url(r'^admin$',views.admin,name='admin'),
+
+    # doctor url
+    url(r'^doctor$',views.doctor, name='doctor'),
+
+    # timezone helper
     url(r'^internal$', views.internal, name='internal'),
 
     # kiosk views

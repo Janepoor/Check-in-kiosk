@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+
+<head>
+    <meta charset="UTF-8">
+        <title>{% block title %}drchrono check in kiosk{% endblock %}</title>
+        <meta name="summary" content="The checkin koisk of drchrono" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        {% block head %}{% endblock %}
+</head>
+
+<body>
+
+  <div class="container" style="margin-bottom: 20px;">
+    <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        {% block main %}
+        {% endblock %}
+      </div>
+    </div>
+  </div>
+
+
+</body>
+</html>

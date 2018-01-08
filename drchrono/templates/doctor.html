@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+
+{% block title %}drchrono appointments{% endblock %}
+
+{% block head %}<meta http-equiv="refresh" content="60" />{% endblock %}
+
+{% block main %}
+
+
+<div>
+  <h1 > Hi, Doctor, here is today's schedule </h1>
+
+</div>
+
+<p class="lead"> current time: {{now}}</p>
+
+
+
+{% for appt in appts_for_day %}
+<form method="post" action="{% url 'doctor' %}">
+  {% csrf_token %}
+  {% if appt.status == 'Arrived' and appt.arrival_time %}
+    <input style="margin-top: 20px;" type="submit" class="btn btn-lg btn-block btn-primary" value="{{ appt.scheduled_time | date:"F j: g:i a" }} |  {{ appt.arrival_time | timesince  }}" />
+  {% elif appt.status == 'Arrived' %}
+    <input style="margin-top: 20px;" type="submit" class="btn btn-lg btn-block btn-success" value="{{ appt.scheduled_time | date:"F j: g:i a" }} | *" />
+  {% else %}
+    <span style="margin-top: 20px;" class="btn btn-lg btn-block btn-info disabled">{{ appt.scheduled_time | date:"F j: g:i a" }} |   {% if appt.wait_time %} {{ appt.wait_time | default:'not ready'}} {% else %} {{ appt.status|default:'Unavailable' }} {% endif %}</span>
+  {% endif %}
+  <input type="hidden" name="appt_id" value="{{ appt.id }}" />
+</form>
+{% empty %}
+  <p>No appointments have found for the near future.</p>
+{% endfor %}
+
+<p >          </p>
+<p style="text-align: left">{{ user.username }} | <a href="{% url 'admin' %}">settings</a> | <a href="{% url 'logout' %}">log out</a></p>
+{% endblock %}

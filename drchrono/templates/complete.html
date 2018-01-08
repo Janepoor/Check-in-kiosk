@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Comfirmation complete{% endblock %}
+
+{% block head %}<meta http-equiv="refresh" content="30; url={% url 'kiosk' instance_guid=instance_guid %}" />{% endblock %}
+
+{% block main %}
+<div>
+  <h2>You are all set!</h2>
+  <p>You have successful checked in for the appointment</p>
+</div>
+
+<div style="margin-top: 20px;">
+  <a href="{% url 'kiosk' instance_guid=instance_guid %}" class="btn btn-success btn-lg btn-block">I'm done! Reset for next patient.</a>
+</div>
+
+{% endblock %}

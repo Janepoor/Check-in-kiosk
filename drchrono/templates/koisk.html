@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}drchrono appointment kiosk{% endblock %}
+
+{% block head %}<meta http-equiv="refresh" content="60" />{% endblock %}
+
+{% block main %}
+<div>
+  <h1>Hello{% if kiosk_name %} from Dr. {{ kiosk_name }}{% endif %}</h1>
+  <p class="lead">Available appointment time are listed below</p>
+</div>
+
+{% for appt in appts_for_day %}
+<form method="post" action="{% url 'checkin' instance_guid=instance_guid %}">
+  {% csrf_token %}
+  <input style="margin-top: 20px;" type="submit" class="btn btn-default btn-lg btn-block" value="#{{ appt.id }} | {{ appt.scheduled_time | date:"F j: g:i a" }}" />
+  <input type="hidden" name="appt_id" value="{{ appt.id }}" />
+</form>
+{% empty %}
+<p>No appointments have found for the near future.</p>
+{% endfor %}
+
+<hr />
+
+{% endblock %}
