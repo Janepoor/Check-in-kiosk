@@ -5,10 +5,27 @@
 {% block head %}<meta http-equiv="refresh" content="60" />{% endblock %}
 
 {% block main %}
-<div>
-  <h1> Today's appointment</h1>
-  <p class="lead">Available appointment time are listed below</p>
+
+<nav class="navbar" >
+  <div class="container-fluid" >
+  <div class="navbar-header">
+        <a class="navbar-brand" >Checkin Kiosk</a>
+      </div>
+      <ul class="nav navbar-nav">
+        <!--<li class="active"><a href="{% url 'home' %}">Patient View</a></li>-->
+        <li><a href="{% url 'logout' %}">Return</a></li>
+      </ul>
+  </div>
+</nav>
+
+<div class="panel panel-default" >
+  <div class="panel-body" align="center">
+    <h1>Appointment List </h1>
+    <p class="lead"> {{now}} </p>
+  </div>
 </div>
+
+
 
 {% for appt in appts_for_day %}
 <form method="post" action="{% url 'checkin' instance_guid=instance_guid %}">
@@ -17,8 +34,9 @@
   <input type="hidden" name="appt_id" value="{{ appt.id }}" />
 </form>
 {% empty %}
-<p>No reservation data for today.</p>
+<p>No reservation data for near three days.</p>
 {% endfor %}
+
 
 <hr />
 

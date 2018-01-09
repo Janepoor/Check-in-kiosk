@@ -3,22 +3,32 @@
 {% block title %}drchrono appointment kiosk{% endblock %}
 
 {% block main %}
+
+<body background="https://d2v9y0dukr6mq2.cloudfront.net/video/thumbnail/SAKGwKC/medical-background-with-loop_4p1uvboye__F0008.png">
 <div>
-  <h1>drchrono appointment kiosk</h1>
-  <p class="lead">The drchrono appointment kiosk offers patients a paperless, digital check-in experience and offers doctors an opportunity to gather and view patient wait time metrics using the drchrono <abbr title="Application Programming Interface">API</abbr>.</p>
+  <h1 align="center">drchrono appointment kiosk</h1>
+  <!--<p class="lead">A simple check in kiosk app using drchrono  <a href="https://www.drchrono.com/api/">API</a>.</p>-->
 </div>
 
-{% if user_access_status %}
-<div>
-  <p class="bg-danger" style="padding: 15px;">It seems that we are unable to access the information needed for this project (access grant failure or endpoint is currently unavailable). Please contact us for assistance.</p>
-</div>
-{% endif %}
+<!--{% if user_access_status %}-->
+<!--<div>-->
+  <!--<p class="bg-danger" style="padding: 15px;">It seems that we are unable to access the information needed for this project (access grant failure or endpoint is currently unavailable). Please contact us for assistance.</p>-->
+<!--</div>-->
+<!--{% endif %}-->
+
 
 <div>
-  <a href="{% url 'social:begin' 'drchrono' %}" class="btn btn-primary btn-lg btn-block">Launch check-in kiosk</a>
+  <a href="{% url 'social:begin' 'drchrono' %}" class="btn btn-info btn-lg btn-block">Patient Check-in</a>
 </div>
 
-<div style="margin-top: 20px;">
-  <a href="{% url 'internal' %}" class="btn btn-default btn-lg btn-block">Launch internal doctor view</a>
+<div >
+  <a href="{% url 'internal' %}" class="btn btn-info btn-lg btn-block">Doctor View</a>
 </div>
+
+<div >
+  <a href="{% url 'about' %}" class="btn btn-info btn-lg btn-block">About</a>
+</div>
+
+
+</body>
 {% endblock %}

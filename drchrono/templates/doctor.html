@@ -1,19 +1,33 @@
 {% extends 'base.html' %}
-
+{% load extras %}
 
 {% block title %}drchrono appointments{% endblock %}
 
 {% block head %}<meta http-equiv="refresh" content="60" />{% endblock %}
 
 {% block main %}
+<nav class="navbar" >
+  <div class="container-fluid" >
+    <div class="navbar-header">
+          <a class="navbar-brand" >Checkin Kiosk</a>
+        </div>
+        <ul class="nav navbar-nav">
+          <li class="active"><a href="{% url 'doctor' %}">Doctor View</a></li>
+          <li><a href="{% url 'home' %}">Patient View</a></li>
+          <li><a href="{% url 'admin' %}">Settings</a></li>
+          <li><a href="{% url 'logout' %}">Return</a></li>
+        </ul>
+      </div>
+</nav>
 
 
-<div>
-  <h1 > Hi, Doctor, here is today's schedule </h1>
 
-</div>
-
-<p class="lead"> current time: {{now}}</p>
+  <div class="panel panel-default">
+    <div class="panel-body" align="center">
+      <h1>Schedule of Dr.{{ user.username }} </h1>
+      <p class="lead"> {{now}} | wait time: {{ wait | duration }}</p>
+    </div>
+  </div>
 
 
 
@@ -21,11 +35,11 @@
 <form method="post" action="{% url 'doctor' %}">
   {% csrf_token %}
   {% if appt.status == 'Arrived' and appt.arrival_time %}
-    <input style="margin-top: 20px;" type="submit" class="btn btn-lg btn-block btn-primary" value="{{ appt.scheduled_time | date:"F j: g:i a" }} |  {{ appt.arrival_time | timesince  }}" />
+    <input style="margin-top: 20px;" type="submit" class="btn btn-lg btn-block btn-primary btn-sm" value="{{ appt.scheduled_time | date:"F j: g:i a" }} | #{{ appt.patient }} | {{ appt.arrival_time | timesince  }}" />
   {% elif appt.status == 'Arrived' %}
-    <input style="margin-top: 20px;" type="submit" class="btn btn-lg btn-block btn-success" value="{{ appt.scheduled_time | date:"F j: g:i a" }} | *" />
+    <input style="margin-top: 20px;" type="submit" class="btn btn-lg btn-block btn-default btn-sm" value="{{ appt.scheduled_time | date:"F j: g:i a" }} | *#{{ appt.patient }}" />
   {% else %}
-    <span style="margin-top: 20px;" class="btn btn-lg btn-block btn-info disabled">{{ appt.scheduled_time | date:"F j: g:i a" }} |   {% if appt.wait_time %} {{ appt.wait_time | default:'not ready'}} {% else %} {{ appt.status|default:'Unavailable' }} {% endif %}</span>
+    <span style="margin-top: 20px;" class="btn btn-lg btn-block btn-default disabled btn-sm ">{{ appt.scheduled_time | date:"F j: g:i a" }} | #{{ appt.patient }} | {% if appt.wait_time %} {{ appt.wait_time | duration}} {% else %} {{ appt.status|default:'Not ready' }} {% endif %}</span>
   {% endif %}
   <input type="hidden" name="appt_id" value="{{ appt.id }}" />
 </form>
@@ -33,6 +47,4 @@
   <p>No appointments have found for the near future.</p>
 {% endfor %}
 
-<p >          </p>
-<p style="text-align: left">{{ user.username }} | <a href="{% url 'admin' %}">settings</a> | <a href="{% url 'logout' %}">log out</a></p>
 {% endblock %}

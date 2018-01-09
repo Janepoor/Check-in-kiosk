@@ -5,23 +5,38 @@
 {% block head %}<meta http-equiv="refresh" content="60" />{% endblock %}
 
 {% block main %}
-<p style="text-align: right">{{ user.username }} | <a href="{% url 'doctor' %}">dashboard</a> | <a href="{% url 'logout' %}">log out</a></p>
 
-<div>
-  <h1>Exceptions/settings</h1>
-</div>
 
-<h2>Cancel a checked-in patient</h2>
+<nav class="navbar" >
+  <div class="container-fluid" >
+    <div class="navbar-header">
+          <a class="navbar-brand" >Doctor Management</a>
+        </div>
+        <ul class="nav navbar-nav">
+          <li><a href="{% url 'doctor' %}">Dashboard</a></li>
+          <li><a href="{% url 'logout' %}">Return</a></li>
+        </ul>
+      </div>
+</nav>
 
-<p>If a patient has changed their mind after checking in and has not been seen, tap on their entry to update their status to Cancelled.</p>
+
+
+  <div class="panel panel-default">
+    <div class="panel-body" align="center">
+      <h1> Dr.{{ user.username }}'s management</h1>
+        <p>Cancel a checked-in patient by click</p>
+    </div>
+  </div>
+
+
 
 {% for appt in appts_for_day %}
 <form method="post" action="{% url 'admin' %}">
   {% csrf_token %}
   {% if appt.status == 'Arrived' %}
-    <input style="margin-top: 20px;" type="submit" class="btn btn-lg btn-block btn-danger" value="{{ appt.scheduled_time | date:"F j: g:i a" }} | Cancel  #{{ appt.id }}" />
+    <input style="margin-top: 20px;" type="submit" class="btn btn-sm btn-block btn-danger" value="{{ appt.scheduled_time | date:"F j: g:i a" }} | Cancel  #{{ appt.id }}" />
   {% else %}
-    <span style="margin-top: 20px;" class="btn btn-lg btn-block btn-default disabled">{{ appt.scheduled_time | date:"F j: g:i a" }} | #{{ appt.id }} | {{ appt.status|default:'Not ready' }}</span>
+    <span style="margin-top: 20px;" class="btn btn-sm btn-block btn-default disabled">{{ appt.scheduled_time | date:"F j: g:i a" }} | #{{ appt.id }} | {{ appt.status|default:'Not ready' }}</span>
   {% endif %}
   <input type="hidden" name="appt_id" value="{{ appt.id }}" />
 </form>
@@ -29,23 +44,22 @@
   <p>No appointments have found for the near future.</p>
 {% endfor %}
 
-<h2>Time zone setting</h2>
+<!--<h2>Time zone setting</h2>-->
 
-<!-- https://docs.djangoproject.com/en/1.10/topics/i18n/timezones/ -->
-<form action="{% url 'admin' %}" method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Set" />
-</form>
+<!--&lt;!&ndash; https://docs.djangoproject.com/en/1.10/topics/i18n/timezones/ &ndash;&gt;-->
+<!--<form action="{% url 'admin' %}" method="POST">-->
+    <!--{% csrf_token %}-->
+    <!--{{ form.as_p }}-->
+    <!--<input type="submit" value="Set" />-->
+<!--</form>-->
 
-<h2>End kiosk sessions</h2>
+<!--<h2>End kiosk sessions</h2>-->
 
-<form action="{% url 'admin' %}" method="POST">
-    {% csrf_token %}
-    {{ end_form.as_p }}
-    <input type="submit" value="Confirm" />
-</form>
+<!--<form action="{% url 'admin' %}" method="POST">-->
+    <!--{% csrf_token %}-->
+    <!--{{ end_form.as_p }}-->
+    <!--<input type="submit" value="Confirm" />-->
+<!--</form>-->
 
-<!--<h2>Appointment window to show</h2>-->
 
 {% endblock %}

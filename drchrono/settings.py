@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+from drchrono.templatetags import extras
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -38,6 +39,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'drchrono',
+    'drchrono.templatetags.extras',
     'social.apps.django_app.default',
 )
 
@@ -96,7 +98,7 @@ DATABASES = {
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'US/Pacific'
 
 USE_I18N = True
 
@@ -116,9 +118,6 @@ STATIC_URL = '/static/'
 # Official setting these on the api console
 SOCIAL_AUTH_DRCHRONO_KEY = 'mogkHhtvyEZsj9pSnnxSCfl1zzSAS0OAew4JQoe6'
 SOCIAL_AUTH_DRCHRONO_SECRET = 'Mr7cGoOXkkaRJeAngD0pA0IxRPKmeR5yWbrD7isgvlChL7GlNtcSMc99BsFi214ogan5bIsiTPCwvZsg6VpyHLhfBW5kUGR9E50DdGX1GT1Vd6kIIlBY5JXnqVpjike3'
-
 SOCIAL_AUTH_DRCHRONO_SCOPE = ['patients:read patients:write user:read calendar:read calendar:write clinical:read clinical:write']
-
 LOGIN_URL = "http://127.0.0.1:8000/login/drchrono/"
-
-LOGIN_REDIRECT_URL = "http://127.0.0.1:8000/complete/drchrono/"
+LOGIN_REDIRECT_URL = "http://127.0.0.1:8000/"
