@@ -115,13 +115,8 @@ def checkin(request, instance_guid):
     else:
         return redirect('error', instance_guid=instance_guid)
 
-
-
 def update(request, instance_guid):
-
-    result = {}
-    if request.method == 'POST':
-
+    if request.method == POST:
         form = PatientVerificationForm(request.POST)
 
         if form.is_valid():
@@ -130,25 +125,18 @@ def update(request, instance_guid):
                 return redirect('home')
 
             appt_id = form.cleaned_data.get('appt_id')
+            appt = call_api(instance.access_token, API_ADDR + 'appointments/' + str(appt_id))
 
-            try:
-                appt = call_api(instance.access_token, API_ADDR+'appointments/' + str(appt_id))
-
-                if appt != STATUS_OK:
-                    return redirect('home')
-
-                if appt['doctor'] != instance.doctor_id or appt['status'] not in ('', 'Confirmed'):
-                    return redirect('error', instance_guid=instance_guid)
-
-                patient = call_api(instance.access_token, API_ADDR +'patients/' + str(appt['patient']))
-
-                if patient != STATUS_OK:
-                    return redirect('home')
-
-            except urllib2.HTTPError as e:
-                logging.info('Error when calling the api')
+            if appt == False:
                 return redirect('home')
 
+            if appt['doctor'] != instance.doctor_id or appt['status'] not in ('', 'Confirmed'):
+                return redirect('error', instance_guid=instance_guid)
+
+            patient = call_api(instance.access_token, API_ADDR +'patients/' + str(appt['patient']))
+
+            if patient == False:
+                return redirect('home')
 
             if patient['gender'] and patient['gender'] != form.cleaned_data.get('gender'):
                 return redirect('error', instance_guid=instance_guid)
@@ -159,21 +147,19 @@ def update(request, instance_guid):
             if patient['last_name'] and patient['last_name'] != form.cleaned_data.get('last_name'):
                 return redirect('error', instance_guid=instance_guid)
 
-            if patient['date_of_birth'] and str(patient['date_of_birth']) != str(form.cleaned_data.get('date_of_birth')):
+            if patient['date_of_birth'] and str(patient['date_of_birth']) != str(
+                    form.cleaned_data.get('date_of_birth')):
                 return redirect('error', instance_guid=instance_guid)
 
             patient['appt_id'] = appt_id
 
             update_form = PatientUpdateForm(initial=patient)
-
-            result['form'] = update_form
-            result['instance_guid'] = instance_guid
-            return render(request, 'update.html', result)
-
+            return render(request, 'update.html', {'form': update_form, 'instance_guid': instance_guid})
         else:
             return redirect('error', instance_guid=instance_guid)
     else:
         return redirect('error', instance_guid=instance_guid)
+
 
 def complete(request, instance_guid):
     if request.method == 'POST':
@@ -209,35 +195,33 @@ def complete(request, instance_guid):
 def doctor(request):
     access_token = request.user.social_auth.get(provider = 'drchrono').extra_data['access_token']
 
-    current_doctor = call_api(access_token, 'https://drchrono.com/api/users/current')
-    doctor_info = call_api(access_token, 'https://drchrono.com/api/doctors/' + str(current_doctor['doctor']))
+    current_doctor = call_api(access_token, API_ADDR +'users/current')
+    doctor_info = call_api(access_token, API_ADDR+ 'doctors/' + str(current_doctor['doctor']))
 
-
-    if current_doctor == False:
+    if current_doctor != STATUS_OK:
         return redirect('home')
 
     doctor_id = current_doctor['doctor']
 
-    if request.method == 'POST':
+    if request.method == POST:
         form = AppointmentSelectionForm(request.POST)
         if form.is_valid():
             appt_id = form.cleaned_data.get('appt_id')
 
-            # patch
-            url = 'https://drchrono.com/api/appointments/'+str(appt_id)
+            url = API_ADDR + 'appointments/'+str(appt_id)
             patch_api(access_token, url, {'status': 'In Session'})
 
-            # update objects
-            visit = Appointment.objects.get_or_none(appt_id=str(appt_id))
-            if visit:
-                visit.time_seen = timezone.now()
-                visit.save()
+            # update visit info
+            appointment = Appointment.objects.get_or_none(appt_id=str(appt_id))
+            if appointment:
+                appointment.time_seen = timezone.now()
+                appointment.save()
 
                 wait_object = Average_wait.objects.get_or_none(doctor_id=doctor_id)
 
                 if wait_object:
                     wait_object.visit_count += 1
-                    wait_object.time_sum = wait_object.time_sum +  (visit.time_seen-visit.arrival_time)
+                    wait_object.time_sum = wait_object.time_sum +  (appointment.time_seen - appointment.arrival_time)
                     wait_object.save()
 
     instance = Kiosk.objects.get_or_none(doctor_id=doctor_id)
@@ -245,43 +229,44 @@ def doctor(request):
         logout(request)
         return redirect('home')
 
-
     date_range = str(datetime.date.today() - datetime.timedelta(hours=24)) + '/' + str(
         datetime.date.today() + datetime.timedelta(hours=24))
 
     appts_response = call_api(instance.access_token, API_ADDR + 'appointments', {'doctor': instance.doctor_id, 'date_range': date_range})
 
-    if appts_response == False:
+    if appts_response != STATUS_OK:
         return redirect('home')
 
+    appt_time_lower = timezone.now() - datetime.timedelta(hours=24)
+    appt_time_upper = timezone.now() + datetime.timedelta(hours=24)
     now = timezone.now()
 
     appts_for_day = []
 
-    for appt in appts_response['results']: # returned in order
+    for appt in appts_response['results']:
+        # returned in order
         if appt['scheduled_time']:
             appt_time = dateutil.parser.parse(appt['scheduled_time'])
 
             tz = timezone.get_current_timezone()
             appt_time = tz.localize(appt_time)
 
-        if appt['patient'] :
+        if appt['patient'] and appt_time >= appt_time_lower and appt_time <= appt_time_upper:
             appt_object = {}
             appt_object['status'] = appt['status']
             appt_object['id'] = appt['id']
             appt_object['patient'] = appt['patient']
             appt_object['scheduled_time'] = appt_time if appt_time else 'Unavailable'
 
-
             if appt['status'] == 'Arrived':
-                visit = Appointment.objects.get_or_none(appt_id=appt['id'])
-                if visit:
-                    appt_object['arrival_time'] = visit.arrival_time
+                appointment = Appointment.objects.get_or_none(appt_id=appt['id'])
+                if appointment:
+                    appt_object['arrival_time'] = appointment.arrival_time
 
-            if appt['status'] in ('In Session', 'Complete'):
-                visit = Appointment.objects.get_or_none(appt_id=appt['id'])
-                if visit and visit.arrival_time and visit.time_seen:
-                    appt_object['wait_time'] = visit.time_seen - visit.arrival_time
+            if appt['status'] == 'In Session' or appt['status'] == 'Complete':
+                appointment = Appointment.objects.get_or_none(appt_id=appt['id'])
+                if appointment and appointment.arrival_time and appointment.time_seen:
+                    appt_object['wait_time'] = appointment.time_seen - appointment.arrival_time
             appts_for_day.append(appt_object)
 
     wait_object = Average_wait.objects.get_or_none(doctor_id=doctor_id)
@@ -299,13 +284,13 @@ def settings(request):
         return redirect('home')
     doctor_id = current_doctor['doctor']
 
-    if request.method == 'POST':
+    if request.method == POST:
         form = AppointmentSelectionForm(request.POST)
         if form.is_valid():
             appt_id = form.cleaned_data.get('appt_id')
 
-            url = API_ADDR+'appointments/'+str(appt_id)
-            result = patch_api(access_token, url, {'status': 'Cancelled'})
+            #url = API_ADDR+'appointments/'+str(appt_id)
+            #result = patch_api(access_token, url, {'status': 'Cancelled'})
 
             visit = Appointment.objects.get_or_none(appt_id=str(appt_id))
             if visit:

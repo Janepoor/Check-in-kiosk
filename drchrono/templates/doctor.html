@@ -25,7 +25,7 @@
   <div class="panel panel-default">
     <div class="panel-body" align="center">
       <h1>Schedule of Dr.{{ user.username }} </h1>
-      <p class="lead"> {{now}} | wait time: {{ wait | duration }}</p>
+      <p class="lead"> {{now|date:"F j: g:i a"}} &nbsp&nbsp wait time: {{ wait | duration }}</p>
     </div>
   </div>
 
@@ -35,11 +35,11 @@
 <form method="post" action="{% url 'doctor' %}">
   {% csrf_token %}
   {% if appt.status == 'Arrived' and appt.arrival_time %}
-    <input style="margin-top: 20px;" type="submit" class="btn btn-lg btn-block btn-primary btn-sm" value="{{ appt.scheduled_time | date:"F j: g:i a" }} | #{{ appt.patient }} | {{ appt.arrival_time | timesince  }}" />
+    <input style="margin-top: 20px;" type="submit" class="btn btn-lg btn-block btn-primary btn-sm" value="{{ appt.scheduled_time   }} &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp No.{{ appt.patient }} &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp {{ appt.arrival_time | timesince  }}" />
   {% elif appt.status == 'Arrived' %}
-    <input style="margin-top: 20px;" type="submit" class="btn btn-lg btn-block btn-default btn-sm" value="{{ appt.scheduled_time | date:"F j: g:i a" }} | *#{{ appt.patient }}" />
+    <input style="margin-top: 20px;" type="submit" class="btn btn-lg btn-block btn-primary btn-sm" value="{{ appt.scheduled_time }} &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp *No.{{ appt.patient }} {{appt.status}}" />
   {% else %}
-    <span style="margin-top: 20px;" class="btn btn-lg btn-block btn-default disabled btn-sm ">{{ appt.scheduled_time | date:"F j: g:i a" }} | #{{ appt.patient }} | {% if appt.wait_time %} {{ appt.wait_time | duration}} {% else %} {{ appt.status|default:'Not ready' }} {% endif %}</span>
+    <span style="margin-top: 20px;" class="btn btn-lg btn-block btn-info disabled btn-sm ">{{ appt.scheduled_time }} &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp No.{{ appt.patient }} &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp {% if appt.wait_time %} {{ appt.wait_time | duration}} {% else %} {{ appt.status|default:'Unchecked' }} {% endif %}</span>
   {% endif %}
   <input type="hidden" name="appt_id" value="{{ appt.id }}" />
 </form>

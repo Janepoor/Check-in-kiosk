@@ -3,23 +3,29 @@
 {% block title %}drchrono appointment kiosk{% endblock %}
 
 {% block main %}
-<div>
-  <h1>Confirm your info below</h1>
 
+
+
+<div class="panel panel-default" >
+  <div class="panel-body" align="center">
+    <h1>Please Confirm your info below </h1>
+  </div>
 </div>
 
-<form method="POST" action="{% url 'complete' instance_guid=instance_guid %}">
+
+
+<form method="POST" action="{% url 'update' instance_guid=instance_guid %}">
 
 {% csrf_token %}
 
 {{ form.as_p }}
 
-<input type="submit" class="btn btn-default btn-lg btn-block" value="Submit" />
+<input type="submit" class="btn btn-default btn-sm btn-block" value="Submit" />
 
 </form>
 
 <div style="margin-top: 20px;">
-  <a href="{% url 'kiosk' instance_guid=instance_guid %}" class="btn btn-default btn-lg btn-block">Back</a>
+  <a href="{% url 'kiosk' instance_guid=instance_guid %}" class="btn btn-default btn-sm btn-block">Back</a>
 </div>
 
 {% endblock %}

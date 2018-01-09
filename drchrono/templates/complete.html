@@ -5,13 +5,20 @@
 {% block head %}<meta http-equiv="refresh" content="30; url={% url 'kiosk' instance_guid=instance_guid %}" />{% endblock %}
 
 {% block main %}
-<div>
+
+
+<div class="panel panel-default" >
+  <div class="panel-body" align="center">
   <h2>You are all set!</h2>
   <p>You have successful checked in for the appointment</p>
+  </div>
 </div>
 
+
+
+
 <div style="margin-top: 20px;">
-  <a href="{% url 'kiosk' instance_guid=instance_guid %}" class="btn btn-success btn-lg btn-block">I'm done! Reset for next patient.</a>
+  <a href="{% url 'kiosk' instance_guid=instance_guid %}" class="btn btn-default btn-sm btn-block">Back to dashboard</a>
 </div>
 
 {% endblock %}
